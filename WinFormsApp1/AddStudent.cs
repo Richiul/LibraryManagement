@@ -29,15 +29,12 @@ namespace WinFormsApp1
                 Int64 scontact = Int64.Parse(txtContact.Text);
                 String semail = txtEmail.Text;
 
-                SqlConnection con = new SqlConnection();
-                con.ConnectionString = "data source = DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary;integrated security =True";
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = con;
+                AddConnection NewConnection = new AddConnection();
+                NewConnection.OpenConnection();
 
-                con.Open();
-                cmd.CommandText = "insert into NewStudent (sName,enroll,dep,sem,contact,email) values ('" + sname + "','" + senroll + "','" + dep + "','" + ssem + "'," + scontact + ",'" + semail + "')";
-                cmd.ExecuteNonQuery();
-                con.Close();
+                NewConnection.ExecuteQueries("insert into NewStudent (sName,enroll,dep,sem,contact,email) values ('" + sname + "','" + senroll + "','" + dep + "','" + ssem + "'," + scontact + ",'" + semail + "')");
+
+                NewConnection.CloseConnection();
 
                 MessageBox.Show("Data Saved", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 txtStudentName.Clear();

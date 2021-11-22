@@ -11,6 +11,7 @@ namespace WinFormsApp1
 {
     public partial class ViewStudent : Form
     {
+        AddConnection NewConnection = new AddConnection();
         public ViewStudent()
         {
             InitializeComponent();
@@ -24,17 +25,15 @@ namespace WinFormsApp1
         private void ViewStudent_Load(object sender, EventArgs e)
         {
             panel3.Visible = false;
-            SqlConnection con = new SqlConnection();
-            con.ConnectionString = "data source=DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary; integrated security = True";
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = con;
-
-            cmd.CommandText = "select * from NewStudent";
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            NewConnection.OpenConnection();
+            
             DataSet ds = new DataSet();
-            da.Fill(ds);
+            NewConnection.da("select * from NewStudent").Fill(ds);
+
 
             dataGridView1.DataSource = ds.Tables[0];
+
+            NewConnection.CloseConnection();
         }
 
         private void btnRefresh_Click(object sender, EventArgs e)
@@ -49,33 +48,29 @@ namespace WinFormsApp1
             {
                 Image image = Image.FromFile("C:/Users/Richard/Desktop/LibraryProject/Liberay Management System/search1.gif");
                 pictureBox1.Image = image;
-                SqlConnection con = new SqlConnection();
-                con.ConnectionString = "data source=DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary; integrated security = True";
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = con;
 
-                cmd.CommandText = "select * from NewStudent where enroll LIKE '" + txtSearch.Text + "%'";
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                NewConnection.OpenConnection();
+
                 DataSet ds = new DataSet();
-                da.Fill(ds);
+                NewConnection.da("select * from NewStudent where enroll LIKE '" + txtSearch.Text + "%'").Fill(ds);
 
                 dataGridView1.DataSource = ds.Tables[0];
+
+                NewConnection.CloseConnection();
             }
             else
             {
                 Image image = Image.FromFile("C:/Users/Richard/Desktop/LibraryProject/Liberay Management System/search.gif");
                 pictureBox1.Image = image;
-                SqlConnection con = new SqlConnection();
-                con.ConnectionString = "data source=DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary; integrated security = True";
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = con;
 
-                cmd.CommandText = "select * from NewStudent";
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                NewConnection.OpenConnection();
+
                 DataSet ds = new DataSet();
-                da.Fill(ds);
+                NewConnection.da("select * from NewStudent").Fill(ds);
 
                 dataGridView1.DataSource = ds.Tables[0];
+
+                NewConnection.CloseConnection();
             }
         }
         int stuid;
@@ -90,15 +85,11 @@ namespace WinFormsApp1
             }
             panel3.Visible = true;
 
-            SqlConnection con = new SqlConnection();
-            con.ConnectionString = "data source=DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary; integrated security = True";
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = con;
+            NewConnection.OpenConnection();
 
-            cmd.CommandText = "select * from NewStudent where stuid = " + stuid + "";
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            
             DataSet ds = new DataSet();
-            da.Fill(ds);
+            NewConnection.da("select * from NewStudent where stuid = " + stuid + "").Fill(ds);
 
             rowid = Int64.Parse(ds.Tables[0].Rows[0][0].ToString());
             txtName.Text = ds.Tables[0].Rows[0][1].ToString();
@@ -107,6 +98,8 @@ namespace WinFormsApp1
             txtSem.Text = ds.Tables[0].Rows[0][4].ToString();
             txtContact.Text = ds.Tables[0].Rows[0][5].ToString();
             txtEmail.Text = ds.Tables[0].Rows[0][6].ToString();
+
+            NewConnection.CloseConnection();
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -128,17 +121,15 @@ namespace WinFormsApp1
                 Int64 contact = Int64.Parse(txtContact.Text);
                 String email = txtEmail.Text;
 
-                SqlConnection con = new SqlConnection();
-                con.ConnectionString = "data source=DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary; integrated security = True";
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = con;
+                NewConnection.OpenConnection();
 
-                cmd.CommandText = "update NewStudent set sName = '" + sname + "', enroll = '" + enroll + "',dep = '" + dep + "',sem = '" + ssem + "',contact = " + contact + ",email = '" + email + "' where stuid = " + rowid + " ";
-
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
-                da.Fill(ds);
+
+                NewConnection.da("update NewStudent set sName = '" + sname + "', enroll = '" + enroll + "',dep = '" + dep + "',sem = '" + ssem + "',contact = " + contact + ",email = '" + email + "' where stuid = " + rowid + " ").Fill(ds);
+                
                 MessageBox.Show("Data updated successfully", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                NewConnection.CloseConnection();
             }
         }
 
@@ -147,17 +138,14 @@ namespace WinFormsApp1
             if (MessageBox.Show("Do you want to delete this book?", "Update", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
 
-                SqlConnection con = new SqlConnection();
-                con.ConnectionString = "data source=DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary; integrated security = True";
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = con;
+                NewConnection.OpenConnection();
 
-                cmd.CommandText = "delete from NewStudent where stuid = " + rowid + "";
-
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
-                da.Fill(ds);
+                NewConnection.da("delete from NewStudent where stuid = " + rowid + "").Fill(ds);
+
                 MessageBox.Show("Book deleted successfully", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                NewConnection.CloseConnection();
             }
         }
 

@@ -11,6 +11,7 @@ namespace WinFormsApp1
 {
     public partial class ReturnBook : Form
     {
+        AddConnection NewConnection = new AddConnection();
         public ReturnBook()
         {
             InitializeComponent();
@@ -40,15 +41,13 @@ namespace WinFormsApp1
 
                 String eid = txtSearch.Text;
 
-                SqlConnection con = new SqlConnection();
-                con.ConnectionString = "data source = DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary; integrated security=True";
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = con;
+                NewConnection.OpenConnection();
 
-                cmd.CommandText = "select * from IssueBook where std_enroll = '" + eid + "' and book_return_date IS NULL";
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                
                 DataSet ds = new DataSet();
-                da.Fill(ds);
+                NewConnection.da("select * from IssueBook where std_enroll = '" + eid + "' and book_return_date IS NULL").Fill(ds);
+
+                NewConnection.CloseConnection();
 
                 if (ds.Tables[0].Rows.Count != 0)
                 {
@@ -91,15 +90,12 @@ namespace WinFormsApp1
 
         private void btnReturn_Click(object sender, EventArgs e)
         {
-            SqlConnection con = new SqlConnection();
-            con.ConnectionString = "data source=DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary; integrated security = True";
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = con;
 
-            con.Open();
-            cmd.CommandText = "update IssueBook set book_return_date = '" + dateTimePicker.Text + "' where std_enroll = '" + txtSearch.Text + "' and id = "+rowid+"";
-            cmd.ExecuteNonQuery();
-            con.Close();
+            NewConnection.OpenConnection();
+
+            NewConnection.ExecuteQueries("update IssueBook set book_return_date = '" + dateTimePicker.Text + "' where std_enroll = '" + txtSearch.Text + "' and id = " + rowid + "");
+
+            NewConnection.CloseConnection();
 
             MessageBox.Show("Returned successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 

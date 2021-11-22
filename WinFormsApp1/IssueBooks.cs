@@ -11,6 +11,7 @@ namespace WinFormsApp1
 {
     public partial class IssueBooks : Form
     {
+        AddConnection NewConnection = new AddConnection();
         public IssueBooks()
         {
             InitializeComponent();
@@ -23,14 +24,12 @@ namespace WinFormsApp1
 
         private void IssueBooks_Load(object sender, EventArgs e)
         {
-            SqlConnection con = new SqlConnection();
-            con.ConnectionString = "data source = DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary; integrated security=True";
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = con;
-            con.Open();
+            
 
-            cmd = new SqlCommand("select bName from NewBook", con);
-            SqlDataReader sdr = cmd.ExecuteReader();
+            NewConnection.OpenConnection();
+            
+
+            SqlDataReader sdr = NewConnection.DataReader("select bName from NewBook");
 
             while (sdr.Read())
             {
@@ -40,8 +39,8 @@ namespace WinFormsApp1
                 }
             }
             sdr.Close();
-            con.Close();
             txtEnroll.Clear();
+            NewConnection.CloseConnection();
 
         }
 
@@ -53,22 +52,17 @@ namespace WinFormsApp1
             {
                 String eid = txtEnroll.Text;
 
-                SqlConnection con = new SqlConnection();
-                con.ConnectionString = "data source = DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary; integrated security=True";
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = con;
+                NewConnection.OpenConnection();
 
-                cmd.CommandText = "select * from NewStudent where enroll = '" + eid + "'";
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                
                 DataSet ds = new DataSet();
-                da.Fill(ds);
+                NewConnection.da("select * from NewStudent where enroll = '" + eid + "'").Fill(ds);
 
                 //******************************************* Number of books issued to a student
 
-                cmd.CommandText = "select count(std_enroll) from IssueBook where std_enroll = '" + eid + "' and book_return_date is null";
-                SqlDataAdapter da1 = new SqlDataAdapter(cmd);
+                
                 DataSet ds1 = new DataSet();
-                da1.Fill(ds1);
+                NewConnection.da("select count(std_enroll) from IssueBook where std_enroll = '" + eid + "' and book_return_date is null").Fill(ds1);
 
                 count = int.Parse(ds1.Tables[0].Rows[0][0].ToString());
 
@@ -91,6 +85,8 @@ namespace WinFormsApp1
                     txtContact.Clear();
                     txtEmail.Clear();
                     MessageBox.Show("Invalid enrollment number", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    NewConnection.CloseConnection();
                 }
             }
         }
@@ -112,15 +108,11 @@ namespace WinFormsApp1
 
                     String eid = txtEnroll.Text;
 
-                    SqlConnection con = new SqlConnection();
-                    con.ConnectionString = "data source = DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary; integrated security=True";
-                    SqlCommand cmd = new SqlCommand();
-                    cmd.Connection = con;
-                    con.Open();
+                    NewConnection.OpenConnection();
 
-                    cmd.CommandText = cmd.CommandText = "insert into IssueBook (std_enroll,std_name,std_dep,std_sem,std_contact,std_email,book_name,book_issue_date) values ('"+enroll+"','"+sname+"','"+sdep+"','"+sem+"',"+contact+",'"+email+"','"+bookname+"','"+bookIssueDate+"')";
-                    cmd.ExecuteNonQuery();
-                    con.Close();
+                    NewConnection.ExecuteQueries("insert into IssueBook (std_enroll,std_name,std_dep,std_sem,std_contact,std_email,book_name,book_issue_date) values ('" + enroll + "','" + sname + "','" + sdep + "','" + sem + "'," + contact + ",'" + email + "','" + bookname + "','" + bookIssueDate + "')");
+
+                    NewConnection.CloseConnection();
 
                     MessageBox.Show("Book is Issued.","Success",MessageBoxButtons.OK,MessageBoxIcon.Information);
                     

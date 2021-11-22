@@ -19,17 +19,12 @@ namespace WinFormsApp1
         private void ViewBook_Load(object sender, EventArgs e)
         {
             panel2.Visible = false;
-            SqlConnection con = new SqlConnection();
-            con.ConnectionString = "data source=DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary; integrated security = True";
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = con;
+            AddConnection NewConnection = new AddConnection();
+            NewConnection.OpenConnection();
 
-            cmd.CommandText = "select * from NewBook";
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataSet ds = new DataSet();
-            da.Fill(ds);
-
-            dataGridView1.DataSource = ds.Tables[0];
+            dataGridView1.DataSource = NewConnection.ShowDataInGridView("select * from NewBook");
+            
+            NewConnection.CloseConnection();
 
         }
 
@@ -58,53 +53,46 @@ namespace WinFormsApp1
         {
             if(txtBookName.Text != "")
             {
-                SqlConnection con = new SqlConnection();
-                con.ConnectionString = "data source=DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary; integrated security = True";
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = con;
 
-                cmd.CommandText = "select * from NewBook where bName LIKE '"+txtBookName.Text+"%'";
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataSet ds = new DataSet();
-                da.Fill(ds);
+                AddConnection NewConnection = new AddConnection();
 
-                dataGridView1.DataSource = ds.Tables[0];
+                NewConnection.OpenConnection();
+
+                dataGridView1.DataSource = NewConnection.ShowDataInGridView("select * from NewBook where bName LIKE '" + txtBookName.Text + "%'");
+
+                NewConnection.CloseConnection();
             }
             else
             {
-                SqlConnection con = new SqlConnection();
-                con.ConnectionString = "data source=DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary; integrated security = True";
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = con;
+                AddConnection NewConnection = new AddConnection();
 
-                cmd.CommandText = "select * from NewBook";
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataSet ds = new DataSet();
-                da.Fill(ds);
+                NewConnection.OpenConnection();
 
-                dataGridView1.DataSource = ds.Tables[0];
+                dataGridView1.DataSource = NewConnection.ShowDataInGridView("select * from NewBook ");
+
+                NewConnection.CloseConnection();
             }
         }
         int bid;
         Int64 rowid;
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if(dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value != null)
+            String sqlCommand = "select * from NewBook where bid = " + bid + ""; 
+            if (dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value != null)
             {
                 bid = int.Parse(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString());
                // MessageBox.Show(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString());
             }
             panel2.Visible = true;
 
-            SqlConnection con = new SqlConnection();
-            con.ConnectionString = "data source=DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary; integrated security = True";
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = con;
+            AddConnection NewConnection = new AddConnection();
 
-            cmd.CommandText = "select * from NewBook where bid = "+bid+"";
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            NewConnection.OpenConnection();
+
+                   
             DataSet ds = new DataSet();
-            da.Fill(ds);
+
+            NewConnection.da(sqlCommand).Fill(ds);
 
             rowid = Int64.Parse(ds.Tables[0].Rows[0][0].ToString());
             txtBName.Text = ds.Tables[0].Rows[0][1].ToString();
@@ -114,6 +102,7 @@ namespace WinFormsApp1
             txtPrice.Text = ds.Tables[0].Rows[0][5].ToString();
             txtQuantity.Text = ds.Tables[0].Rows[0][6].ToString();
 
+            NewConnection.CloseConnection();
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -124,9 +113,9 @@ namespace WinFormsApp1
         private void btnUpdate_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Do you want to update your data?", "Update", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                {
+            {
 
-            
+
 
                 String bname = txtBName.Text;
                 String bauthor = txtAuthor.Text;
@@ -134,17 +123,13 @@ namespace WinFormsApp1
                 String pdate = txtPDate.Text;
                 Int64 price = Int64.Parse(txtPrice.Text);
                 Int64 quantity = Int64.Parse(txtQuantity.Text);
+                String sqlCommand = "update NewBook set bName = '" + bname + "', bAuthor = '" + bauthor + "', bPubl = '" + publication + "', bPDate = '" + pdate + "', bPrice = " + price + ", bQuan = " + quantity + " where bid = " + rowid + " ";
 
-                SqlConnection con = new SqlConnection();
-                con.ConnectionString = "data source=DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary; integrated security = True";
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = con;
-
-                cmd.CommandText = "update NewBook set bName = '" + bname + "', bAuthor = '" + bauthor + "',bPubl = '" + publication + "',bPDate = '" + pdate + "',bPrice = " + price + ",bQuan = " + quantity + " where bid = " + rowid + " ";
-
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                AddConnection NewConnection = new AddConnection();
+                NewConnection.OpenConnection();
                 DataSet ds = new DataSet();
-                da.Fill(ds);
+                NewConnection.da(sqlCommand).Fill(ds);
+                NewConnection.CloseConnection();
                 MessageBox.Show("Data updated successfully", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
@@ -153,20 +138,20 @@ namespace WinFormsApp1
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
+            String sqlString = "delete from NewBook where bid = " + rowid + "";
             if (MessageBox.Show("Do you want to delete this book?", "Update", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
 
-                SqlConnection con = new SqlConnection();
-                con.ConnectionString = "data source=DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary; integrated security = True";
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = con;
+                AddConnection NewConnection = new AddConnection();
+                NewConnection.OpenConnection();
 
-                cmd.CommandText = "delete from NewBook where bid = "+rowid+"";
-
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
-                da.Fill(ds);
+
+                NewConnection.da(sqlString).Fill(ds);
+
                 MessageBox.Show("Book deleted successfully", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                NewConnection.CloseConnection();
             }
         }
     }

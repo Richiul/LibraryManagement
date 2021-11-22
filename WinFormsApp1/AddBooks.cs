@@ -54,15 +54,14 @@ namespace WinFormsApp1
                 Int64 price = Int64.Parse(txtBookPrice.Text);
                 Int64 quan = Int64.Parse(txtQuantity.Text);
 
-                SqlConnection con = new SqlConnection();
-                con.ConnectionString = "data source = DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary;integrated security =True";
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = con;
+                AddConnection NewConnection = new AddConnection();
+                NewConnection.OpenConnection();
 
-                con.Open();
-                cmd.CommandText = "insert into NewBook (bName,bAuthor,bPubl,bPDate,bPrice,bQuan) values ('" + bname + "','" + bauthor + "','" + publication + "','" + pdate + "'," + price + "," + quan + ")";
-                cmd.ExecuteNonQuery();
-                con.Close();
+                NewConnection.ExecuteQueries("insert into NewBook (bName,bAuthor,bPubl,bPDate,bPrice,bQuan) values ('" + bname + "','" + bauthor + "','" + publication + "','" + pdate + "'," + price + "," + quan + ")");
+
+                NewConnection.CloseConnection();
+
+
 
                 MessageBox.Show("Data Saved", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 txtBookName.Clear();
