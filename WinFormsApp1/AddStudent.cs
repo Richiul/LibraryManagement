@@ -21,18 +21,22 @@ namespace WinFormsApp1
             if (txtStudentName.Text != "" && txtEnroll.Text != "" && txtDep.Text != "" && txtSem.Text != "" && txtContact.Text != "" && txtEmail.Text != "")
             {
 
-
-                String sname = txtStudentName.Text;
-                String senroll = txtEnroll.Text;
-                String dep = txtDep.Text;
-                String ssem = txtSem.Text;
-                Int64 scontact = Int64.Parse(txtContact.Text);
-                String semail = txtEmail.Text;
+                
 
                 AddConnection NewConnection = new AddConnection();
-                NewConnection.OpenConnection();
+                
 
-                NewConnection.ExecuteQueries("insert into NewStudent (sName,enroll,dep,sem,contact,email) values ('" + sname + "','" + senroll + "','" + dep + "','" + ssem + "'," + scontact + ",'" + semail + "')");
+                
+                SqlCommand cmd = new SqlCommand("insert into NewStudent (sName,enroll,dep,sem,contact,email) values (@sName,@enroll,@dep,@sem,@contact,@email)",NewConnection.OpenConnection());
+                cmd.Parameters.AddWithValue("@sName", txtStudentName.Text);
+                cmd.Parameters.AddWithValue("@enroll", txtEnroll.Text);
+                cmd.Parameters.AddWithValue("@dep", txtDep.Text);
+                cmd.Parameters.AddWithValue("@sem", txtSem.Text);
+                cmd.Parameters.AddWithValue("@contact", txtContact.Text);
+                cmd.Parameters.AddWithValue("@email", txtEmail.Text);
+                cmd.ExecuteNonQuery();
+
+
 
                 NewConnection.CloseConnection();
 

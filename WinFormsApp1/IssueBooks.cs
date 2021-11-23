@@ -50,19 +50,26 @@ namespace WinFormsApp1
         {
             if(txtEnroll.Text != "")
             {
-                String eid = txtEnroll.Text;
-
-                NewConnection.OpenConnection();
 
                 
+
+                String eid = txtEnroll.Text;
+
+
+
+                SqlCommand cmd = new SqlCommand("select * from NewStudent where enroll = @eid",NewConnection.OpenConnection());
+                cmd.Parameters.AddWithValue("@eid",txtEnroll.Text);
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
-                NewConnection.da("select * from NewStudent where enroll = '" + eid + "'").Fill(ds);
+                da.Fill(ds);
 
                 //******************************************* Number of books issued to a student
 
-                
+                SqlCommand cmd1 = new SqlCommand("select count(std_enroll) from IssueBook where std_enroll = @eid and book_return_date is null", NewConnection.OpenConnection());
+                cmd1.Parameters.AddWithValue("@eid", txtEnroll.Text);
+                SqlDataAdapter da1 = new SqlDataAdapter(cmd1);
                 DataSet ds1 = new DataSet();
-                NewConnection.da("select count(std_enroll) from IssueBook where std_enroll = '" + eid + "' and book_return_date is null").Fill(ds1);
+                da1.Fill(ds1);
 
                 count = int.Parse(ds1.Tables[0].Rows[0][0].ToString());
 
@@ -97,20 +104,17 @@ namespace WinFormsApp1
             {
                 if(cmbBookName.SelectedIndex != -1 && count <= 2)
                 {
-                    String enroll = txtEnroll.Text;
-                    String sname = txtStudentName.Text;
-                    String sdep = txtDep.Text;
-                    String sem = txtSem.Text;
-                    Int64 contact = Int64.Parse(txtContact.Text);
-                    String email = txtEmail.Text;
-                    String bookname = cmbBookName.Text;
-                    String bookIssueDate = dateTimePicker1.Text;
 
-                    String eid = txtEnroll.Text;
-
-                    NewConnection.OpenConnection();
-
-                    NewConnection.ExecuteQueries("insert into IssueBook (std_enroll,std_name,std_dep,std_sem,std_contact,std_email,book_name,book_issue_date) values ('" + enroll + "','" + sname + "','" + sdep + "','" + sem + "'," + contact + ",'" + email + "','" + bookname + "','" + bookIssueDate + "')");
+                    SqlCommand cmd = new SqlCommand("insert into IssueBook (std_enroll,std_name,std_dep,std_sem,std_contact,std_email,book_name,book_issue_date) values (@std_enroll,@std_name,@std_dep,@std_sem,@std_contact,@std_email,@book_name,@book_issue_date)",NewConnection.OpenConnection());
+                    cmd.Parameters.AddWithValue("@std_enroll",txtEnroll.Text);
+                    cmd.Parameters.AddWithValue("@std_name",txtStudentName.Text);
+                    cmd.Parameters.AddWithValue("@std_dep",txtDep.Text);
+                    cmd.Parameters.AddWithValue("@std_sem",txtSem.Text);
+                    cmd.Parameters.AddWithValue("@std_contact",txtContact.Text);
+                    cmd.Parameters.AddWithValue("@std_email", txtEmail.Text);
+                    cmd.Parameters.AddWithValue("@book_name",cmbBookName.Text);
+                    cmd.Parameters.AddWithValue("@book_issue_date",dateTimePicker1.Text);
+                    cmd.ExecuteNonQuery();
 
                     NewConnection.CloseConnection();
 

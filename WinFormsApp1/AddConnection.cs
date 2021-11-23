@@ -11,10 +11,17 @@ namespace WinFormsApp1
         string ConnectionString = "data source = DESKTOP-IQB4442\\SQLEXPRESS; database = DBLibrary;integrated security =True";
         SqlConnection con;
 
-        public void OpenConnection()
+        public SqlConnection OpenConnection()
         {
             con = new SqlConnection(ConnectionString);
             con.Open();
+            return con;
+        }
+
+        public SqlConnection con1()
+        {
+            con = new SqlConnection(ConnectionString);
+            return con;
         }
 
 
@@ -26,6 +33,7 @@ namespace WinFormsApp1
 
         public void ExecuteQueries(string Query_)
         {
+            
             SqlCommand cmd = new SqlCommand(Query_, con);
             cmd.ExecuteNonQuery();
         }
@@ -55,6 +63,8 @@ namespace WinFormsApp1
             SqlDataAdapter da = new SqlDataAdapter(cmd);
             return da;
         }
+
+        
 
     }
 }

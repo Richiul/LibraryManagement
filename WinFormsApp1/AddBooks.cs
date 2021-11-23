@@ -44,20 +44,20 @@ namespace WinFormsApp1
         private void btnSave_Click(object sender, EventArgs e)
         {
             if (txtBookName.Text != "" && txtAuthor.Text != "" && txtPublication.Text != "" && txtBookPrice.Text != "" && txtQuantity.Text != "")
-            {
-
-
-                String bname = txtBookName.Text;
-                String bauthor = txtAuthor.Text;
-                String publication = txtPublication.Text;
-                String pdate = dateTimePicker1.Text;
-                Int64 price = Int64.Parse(txtBookPrice.Text);
-                Int64 quan = Int64.Parse(txtQuantity.Text);
+            { 
 
                 AddConnection NewConnection = new AddConnection();
-                NewConnection.OpenConnection();
+                
 
-                NewConnection.ExecuteQueries("insert into NewBook (bName,bAuthor,bPubl,bPDate,bPrice,bQuan) values ('" + bname + "','" + bauthor + "','" + publication + "','" + pdate + "'," + price + "," + quan + ")");
+                SqlCommand cmd = new SqlCommand("insert into NewBook (bName,bAuthor,bPubl,bPDate,bPrice,bQuan) values (@bName,@bAuthor,@bPubl,@bPDate,@bPrice,@bQuan)",NewConnection.OpenConnection());
+                cmd.Parameters.AddWithValue("@bName",txtBookName.Text);
+                cmd.Parameters.AddWithValue("@bAuthor",txtAuthor.Text);
+                cmd.Parameters.AddWithValue("@bPubl",txtPublication.Text);
+                cmd.Parameters.AddWithValue("@bPDate",dateTimePicker1.Text);
+                cmd.Parameters.AddWithValue("@bPrice",txtBookPrice.Text);
+                cmd.Parameters.AddWithValue("@bQuan",txtQuantity.Text);
+                cmd.ExecuteNonQuery();
+
 
                 NewConnection.CloseConnection();
 

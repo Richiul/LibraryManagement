@@ -11,6 +11,7 @@ namespace WinFormsApp1
 {
     public partial class ViewBook : Form
     {
+        AddConnection newConnection = new AddConnection();
         public ViewBook()
         {
             InitializeComponent();
@@ -19,12 +20,12 @@ namespace WinFormsApp1
         private void ViewBook_Load(object sender, EventArgs e)
         {
             panel2.Visible = false;
-            AddConnection NewConnection = new AddConnection();
-            NewConnection.OpenConnection();
+            SqlCommand cmd = new SqlCommand("select * from NewBook",newConnection.OpenConnection());
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            da.Fill(ds);
 
-            dataGridView1.DataSource = NewConnection.ShowDataInGridView("select * from NewBook");
-            
-            NewConnection.CloseConnection();
+            dataGridView1.DataSource = ds.Tables[0];
 
         }
 
@@ -35,7 +36,7 @@ namespace WinFormsApp1
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-            
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -51,48 +52,51 @@ namespace WinFormsApp1
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            if(txtBookName.Text != "")
+            if (txtBookName.Text != "")
             {
 
-                AddConnection NewConnection = new AddConnection();
+                SqlCommand cmd = new SqlCommand("select * from NewBook where bName LIKE '%'+@bName+'%'",newConnection.OpenConnection());
+                cmd.Parameters.AddWithValue("@bName", txtBookName.Text);
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                DataSet ds = new DataSet();
+                da.Fill(ds);
 
-                NewConnection.OpenConnection();
+                dataGridView1.DataSource = ds.Tables[0];
 
-                dataGridView1.DataSource = NewConnection.ShowDataInGridView("select * from NewBook where bName LIKE '" + txtBookName.Text + "%'");
-
-                NewConnection.CloseConnection();
+                newConnection.CloseConnection();
             }
             else
             {
-                AddConnection NewConnection = new AddConnection();
+               SqlCommand cmd = new SqlCommand("select * from NewBook",newConnection.OpenConnection());
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                DataSet ds = new DataSet();
+                da.Fill(ds);
 
-                NewConnection.OpenConnection();
+                dataGridView1.DataSource = ds.Tables[0];
 
-                dataGridView1.DataSource = NewConnection.ShowDataInGridView("select * from NewBook ");
-
-                NewConnection.CloseConnection();
+                newConnection.CloseConnection();
             }
         }
         int bid;
         Int64 rowid;
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            String sqlCommand = "select * from NewBook where bid = " + bid + ""; 
             if (dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value != null)
             {
                 bid = int.Parse(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString());
-               // MessageBox.Show(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString());
+                // MessageBox.Show(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString());
             }
             panel2.Visible = true;
 
-            AddConnection NewConnection = new AddConnection();
+            
 
-            NewConnection.OpenConnection();
 
-                   
+            SqlCommand cmd = new SqlCommand("select * from NewBook where bid = @bid",newConnection.OpenConnection());
+            cmd.Parameters.AddWithValue("@bid",bid);
+
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
             DataSet ds = new DataSet();
-
-            NewConnection.da(sqlCommand).Fill(ds);
+            da.Fill(ds);
 
             rowid = Int64.Parse(ds.Tables[0].Rows[0][0].ToString());
             txtBName.Text = ds.Tables[0].Rows[0][1].ToString();
@@ -101,8 +105,8 @@ namespace WinFormsApp1
             txtPDate.Text = ds.Tables[0].Rows[0][4].ToString();
             txtPrice.Text = ds.Tables[0].Rows[0][5].ToString();
             txtQuantity.Text = ds.Tables[0].Rows[0][6].ToString();
+            newConnection.CloseConnection();
 
-            NewConnection.CloseConnection();
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -115,22 +119,20 @@ namespace WinFormsApp1
             if (MessageBox.Show("Do you want to update your data?", "Update", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
 
-
-
-                String bname = txtBName.Text;
-                String bauthor = txtAuthor.Text;
-                String publication = txtPublication.Text;
-                String pdate = txtPDate.Text;
-                Int64 price = Int64.Parse(txtPrice.Text);
-                Int64 quantity = Int64.Parse(txtQuantity.Text);
-                String sqlCommand = "update NewBook set bName = '" + bname + "', bAuthor = '" + bauthor + "', bPubl = '" + publication + "', bPDate = '" + pdate + "', bPrice = " + price + ", bQuan = " + quantity + " where bid = " + rowid + " ";
-
-                AddConnection NewConnection = new AddConnection();
-                NewConnection.OpenConnection();
+                SqlCommand cmd = new SqlCommand("update NewBook set bName = @bName, bAuthor = @bAuthor, bPubl = @bPubl, bPDate = @bPDate, bPrice = @bPrice, bQuan = @bQuan where bid = @rowid ", newConnection.OpenConnection());
+                cmd.Parameters.AddWithValue("@bName", txtBName.Text);
+                cmd.Parameters.AddWithValue("@bAuthor",txtAuthor.Text);
+                cmd.Parameters.AddWithValue("@bPubl",txtPublication.Text);
+                cmd.Parameters.AddWithValue("@bPDate",txtPDate.Text);
+                cmd.Parameters.AddWithValue("@bPrice",txtPrice.Text);
+                cmd.Parameters.AddWithValue("@bQuan",txtQuantity.Text);
+                cmd.Parameters.AddWithValue("@rowid", rowid);
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
-                NewConnection.da(sqlCommand).Fill(ds);
-                NewConnection.CloseConnection();
+                da.Fill(ds);
                 MessageBox.Show("Data updated successfully", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                newConnection.CloseConnection();
+                ViewBook_Load(this, null);
             }
 
 
@@ -138,20 +140,17 @@ namespace WinFormsApp1
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            String sqlString = "delete from NewBook where bid = " + rowid + "";
             if (MessageBox.Show("Do you want to delete this book?", "Update", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
 
-                AddConnection NewConnection = new AddConnection();
-                NewConnection.OpenConnection();
-
+                SqlCommand cmd = new SqlCommand("delete from NewBook where bid = @rowid",newConnection.OpenConnection());
+                cmd.Parameters.AddWithValue("@rowid", rowid);
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
-
-                NewConnection.da(sqlString).Fill(ds);
-
+                da.Fill(ds);
                 MessageBox.Show("Book deleted successfully", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-
-                NewConnection.CloseConnection();
+                newConnection.CloseConnection();
+                ViewBook_Load(this, null);
             }
         }
     }

@@ -49,10 +49,13 @@ namespace WinFormsApp1
                 Image image = Image.FromFile("C:/Users/Richard/Desktop/LibraryProject/Liberay Management System/search1.gif");
                 pictureBox1.Image = image;
 
-                NewConnection.OpenConnection();
+                
 
+                SqlCommand cmd = new SqlCommand("select * from NewStudent where enroll LIKE @enroll+'%'", NewConnection.OpenConnection());
+                cmd.Parameters.AddWithValue("@enroll", txtSearch.Text);
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
-                NewConnection.da("select * from NewStudent where enroll LIKE '" + txtSearch.Text + "%'").Fill(ds);
+                da.Fill(ds);
 
                 dataGridView1.DataSource = ds.Tables[0];
 
@@ -87,9 +90,11 @@ namespace WinFormsApp1
 
             NewConnection.OpenConnection();
 
-            
+            SqlCommand cmd = new SqlCommand("select * from NewStudent where stuid = @stuid", NewConnection.OpenConnection());
+            cmd.Parameters.AddWithValue("@stuid", stuid);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
             DataSet ds = new DataSet();
-            NewConnection.da("select * from NewStudent where stuid = " + stuid + "").Fill(ds);
+            da.Fill(ds);
 
             rowid = Int64.Parse(ds.Tables[0].Rows[0][0].ToString());
             txtName.Text = ds.Tables[0].Rows[0][1].ToString();
@@ -112,24 +117,23 @@ namespace WinFormsApp1
             if (MessageBox.Show("Do you want to update your data?", "Update", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
 
-
-
-                String sname = txtName.Text;
-                String enroll = txtEnroll.Text;
-                String dep = txtDep.Text;
-                String ssem = txtSem.Text;
-                Int64 contact = Int64.Parse(txtContact.Text);
-                String email = txtEmail.Text;
-
-                NewConnection.OpenConnection();
-
+                SqlCommand cmd = new SqlCommand("update NewStudent set sName = @sName, enroll = @enroll, dep = @dep,sem = @sem, contact = @contact, email = @email where stuid = @rowid ",NewConnection.OpenConnection());
+                cmd.Parameters.AddWithValue("@sName",txtName.Text);
+                cmd.Parameters.AddWithValue("@enroll",txtEnroll.Text);
+                cmd.Parameters.AddWithValue("@dep",txtDep.Text);
+                cmd.Parameters.AddWithValue("@sem",txtSem.Text);
+                cmd.Parameters.AddWithValue("@contact",txtContact.Text);
+                cmd.Parameters.AddWithValue("@email",txtEmail.Text);
+                cmd.Parameters.AddWithValue("@rowid",rowid);
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
 
-                NewConnection.da("update NewStudent set sName = '" + sname + "', enroll = '" + enroll + "',dep = '" + dep + "',sem = '" + ssem + "',contact = " + contact + ",email = '" + email + "' where stuid = " + rowid + " ").Fill(ds);
+                da.Fill(ds);
                 
                 MessageBox.Show("Data updated successfully", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 NewConnection.CloseConnection();
+                ViewStudent_Load(this, null);
             }
         }
 
@@ -140,12 +144,17 @@ namespace WinFormsApp1
 
                 NewConnection.OpenConnection();
 
+                SqlCommand cmd = new SqlCommand("delete from NewStudent where stuid = @rowid",NewConnection.OpenConnection());
+                cmd.Parameters.AddWithValue("@rowid", rowid);
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
-                NewConnection.da("delete from NewStudent where stuid = " + rowid + "").Fill(ds);
+                da.Fill(ds);
 
                 MessageBox.Show("Book deleted successfully", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 NewConnection.CloseConnection();
+                ViewStudent_Load(this, null);
+                
             }
         }
 

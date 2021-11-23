@@ -39,13 +39,14 @@ namespace WinFormsApp1
             {
 
 
-                String eid = txtSearch.Text;
+                
 
                 NewConnection.OpenConnection();
-
-                
+                SqlCommand cmd = new SqlCommand("select * from IssueBook where std_enroll = @std_enroll and book_return_date IS NULL", NewConnection.OpenConnection());
+                cmd.Parameters.AddWithValue("@std_enroll", txtSearch.Text);
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataSet ds = new DataSet();
-                NewConnection.da("select * from IssueBook where std_enroll = '" + eid + "' and book_return_date IS NULL").Fill(ds);
+                da.Fill(ds);
 
                 NewConnection.CloseConnection();
 
@@ -93,7 +94,11 @@ namespace WinFormsApp1
 
             NewConnection.OpenConnection();
 
-            NewConnection.ExecuteQueries("update IssueBook set book_return_date = '" + dateTimePicker.Text + "' where std_enroll = '" + txtSearch.Text + "' and id = " + rowid + "");
+            SqlCommand cmd = new SqlCommand("update IssueBook set book_return_date = @book_return_date where std_enroll = @std_enroll and id = @rowid", NewConnection.OpenConnection());
+            cmd.Parameters.AddWithValue("@book_return_date", dateTimePicker.Text);
+            cmd.Parameters.AddWithValue("@std_enroll", txtSearch.Text);
+            cmd.Parameters.AddWithValue("@rowid", rowid);
+            cmd.ExecuteNonQuery();
 
             NewConnection.CloseConnection();
 
